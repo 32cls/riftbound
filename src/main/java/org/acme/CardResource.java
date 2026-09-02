@@ -1,5 +1,7 @@
 package org.acme;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -13,33 +15,36 @@ import jakarta.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 
-@Path("/decks")
-public class DeckResource {
+@Path("/cards")
+public class CardResource {
 
     @GET
+    @PermitAll
     @Produces(MediaType.APPLICATION_JSON)
-    public Response decks() {
-        List<Deck> decks = Deck.listAll();
-        return Response.ok(decks).build();
+    public Response listCards() {
+        List<Card> cards = Card.listAll();
+        return Response.ok(cards).build();
     }
 
     @POST
     @Transactional
+    @RolesAllowed("user")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createDeck(Deck myDeck) {
-        myDeck.persist();
-        return Response.created(URI.create("/decks/"+myDeck.id)).build();
+    public Response addCard(Card card) {
+        card.persist();
+        return Response.created(URI.create("/cards/"+card.id)).build();
     }
 
     @DELETE
-    @Path("/{deckId}")
+    @Path("/{cardId}")
+    @RolesAllowed("user")
     @Transactional
-    public Response deleteDeck(Long deckId) {
-        Deck found = Deck.findById(deckId);
+    public Response deleteDeck(Long cardId) {
+        Card found = Card.findById(cardId);
         if (found == null){
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        Deck.deleteById(deckId);
+        Card.deleteById(cardId);
         return Response.noContent().build();
     }
 }
