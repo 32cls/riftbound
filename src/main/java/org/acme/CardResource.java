@@ -2,7 +2,10 @@ package org.acme;
 
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -14,9 +17,13 @@ import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 @Path("/cards")
 public class CardResource {
+
+    @Inject
+    Validator validator;
 
     @GET
     @PermitAll
@@ -30,9 +37,15 @@ public class CardResource {
     @Transactional
     @RolesAllowed("user")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addCard(Card card) {
-        card.persist();
-        return Response.created(URI.create("/cards/"+card.id)).build();
+    public Response addCard(CardInput cardInput) {
+        Set<ConstraintViolation<CardInput>> violations = validator.validate(cardInput);
+        if (violations.isEmpty()) {
+            Card card = new Card(cardInput.name, cardInput.language, new User());
+            card.persist();
+            return Response.created(URI.create("/cards/"+card.id)).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
     }
 
     @DELETE

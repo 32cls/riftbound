@@ -8,7 +8,6 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import java.util.List;
 
-
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.security.jpa.Password;
 import io.quarkus.security.jpa.Roles;
@@ -43,4 +42,5 @@ public class User extends PanacheEntity {
         user.persist();
         return user.id;
     }
+
 }
