@@ -40,7 +40,11 @@ public class CardResource {
     public Response addCard(CardInput cardInput) {
         Set<ConstraintViolation<CardInput>> violations = validator.validate(cardInput);
         if (violations.isEmpty()) {
-            Card card = new Card(cardInput.name, cardInput.language, new User());
+            CardReference cardReference = CardReference.findByName(cardInput.name);
+            if (cardReference == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            Card card = new Card(cardInput.language, cardInput.quality, cardInput.quantity, new User(), cardReference);
             card.persist();
             return Response.created(URI.create("/cards/"+card.id)).build();
         } else {
