@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.ws.rs.NotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import java.util.List;
@@ -41,6 +42,18 @@ public class User extends PanacheEntity {
         user.role = "user";
         user.persist();
         return user.id;
+    }
+
+    public static User checkLogin(String username, String password) throws NotFoundException {
+        User user = find("username", username).firstResult();
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+        if (BcryptUtil.matches(password, user.password)) {
+            return user;
+        } else {
+            throw new RuntimeException("Invalid password exception");
+        }
     }
 
 }
