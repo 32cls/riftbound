@@ -21,9 +21,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.acme.Card.Language;
 import org.acme.Card.Quality;
@@ -76,18 +79,23 @@ public class CardResource {
         Scanner scanner;
         try {
             scanner = new Scanner(file);
+            HashMap<String,Integer> cardNames = new HashMap<>();
             List<Card> cards = new ArrayList<>();
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] parsedLine = line.split(" ", 2);
                 int quantity = Integer.parseInt(parsedLine[0]);
                 String parsedCardName = parsedLine[1].split(" \\(", 2)[0].replace(",", "").replace(" -", "");
-                CardReference cardReference = CardReference.findByName(parsedCardName);
-                if (cardReference == null) {
-                    System.out.println("couldn't find card with name : " + parsedCardName);
-                }
-                cards.add(new Card(Language.ENGLISH, Quality.NEAR_MINT, quantity, authenticatedUser, cardReference));
+                cardNames.put(parsedCardName, quantity);
             }
+            List<CardReference> cardReferences = CardReference.find("name in ?1", cardNames.keySet()).list();
+            Map<String, CardReference> refByName = cardReferences.stream().collect(Collectors.toMap(r -> r.name, r -> r, (a, b) -> a));
+            cardNames.forEach((key, val) -> {
+                CardReference ref = refByName.get(key);
+                if (ref != null) {
+                    cards.add(new Card(Language.ENGLISH, Quality.NEAR_MINT, val, authenticatedUser, ref));
+                }
+            });
             Card.persist(cards);
             scanner.close();
         } catch (FileNotFoundException e){
@@ -95,7 +103,7 @@ public class CardResource {
         }
         return Response.created(URI.create("/cards")).build();
     }
-
+    
     @DELETE
     @Path("/{cardId}")
     @RolesAllowed("user")

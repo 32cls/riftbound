@@ -1,5 +1,7 @@
 package org.acme;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -8,7 +10,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 
 @Entity
 @JsonIdentityInfo (
@@ -41,14 +42,15 @@ public class Card extends PanacheEntity {
     @ManyToOne
     public CardReference cardReference;
 
-   //@OneToOne
-   //public Optional<User> borrower;
-
     public Card(Language language, Quality quality, int quantity, User owner, CardReference cardReference){
         this.language = language;
         this.quality = quality;
         this.quantity = quantity;
         this.owner = owner;
         this.cardReference = cardReference;
+    }
+
+    public static List<Card> findBorrowableCards(List<CardInput> cardInputs){
+        return new ArrayList<>();
     }
 }

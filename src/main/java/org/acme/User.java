@@ -24,21 +24,25 @@ import io.quarkus.security.jpa.Username;
 @Table(name="app_users")
 @UserDefinition
 @JsonIdentityInfo (
-  generator = ObjectIdGenerators.PropertyGenerator.class, 
+  generator = ObjectIdGenerators.PropertyGenerator.class,
   property = "id")
 public class User extends PanacheEntity {
     @Username
     public String username;
-    
+
     @Password
-    @JsonIgnore 
+    @JsonIgnore
     public String password;
     @Roles
     public String role;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
-    @JsonManagedReference 
+    @JsonManagedReference
     public List<Card> inventory;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "borrower")
+    @JsonManagedReference
+    public List<Card> borrowing;
 
     /**
      * Adds a new user to the database

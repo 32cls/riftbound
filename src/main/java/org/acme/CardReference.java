@@ -10,7 +10,7 @@ public class CardReference extends PanacheEntity {
 
     public String riftboundId;
 
-    public String cardName;
+    public String name;
 
     public String set;
 
@@ -20,14 +20,14 @@ public class CardReference extends PanacheEntity {
 
     public CardReference(String riftboundId, String name, String set, String imageUrl, boolean isNew){
         this.riftboundId = riftboundId;
-        this.cardName = name;
+        this.name = name;
         this.set = set;
         this.imageUrl = imageUrl;
         this.isNew = isNew;
     }
 
     public static CardReference findByName(String name){
-        return find("cardName", name).firstResult();
+        return find("name", name).firstResult();
     }
 
     public static CardReference fromCardReferenceDto(CardReferenceDto cardReferenceDto) {
