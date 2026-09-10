@@ -1,8 +1,6 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+package org.acme.scheduler;
+
+import java.util.stream.Stream;
 
 import org.acme.CardReference;
 import org.acme.dto.CardReferenceDto;
@@ -13,23 +11,34 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import io.quarkus.scheduler.Scheduled;
 import io.quarkus.scheduler.ScheduledExecution;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class CardReferenceUpdaterBean {
 
-    @RestClient 
+    @RestClient
     CardReferenceService cardReferenceService;
-    
-    @Scheduled(cron="0 0 3 * * ?")
+
+    @Scheduled(cron="* * * * * ?")
+    @Transactional
     void cronJob(ScheduledExecution execution) {
+        if (CardReference.count() > 0) {
+            return;
+        }
         int pageCounter = 1;
         CardRequestDto cardRequestDto = cardReferenceService.getBatchCards(100, pageCounter);
-        do {
-            CardRequestDto cardRequestDto = cardReferenceService.getBatchCards(100, pageCounter++);
-        } while (pageCounter < cardRequestDto.pages);
-        List<CardReference> cardReferences = cardRefDtos.stream().map((CardReferenceDto cardRefDto) -> {
+        persistRequestResult(cardRequestDto);
+        while (pageCounter < cardRequestDto.pages) {
+            CardRequestDto newRequest = cardReferenceService.getBatchCards(100, ++pageCounter);
+            persistRequestResult(newRequest);
+        }
+    }
+
+    private void persistRequestResult(CardRequestDto cardRequestDto){
+        Stream<CardReference> cardReferences = cardRequestDto.items.stream().map((CardReferenceDto cardRefDto) -> {
             return CardReference.fromCardReferenceDto(cardRefDto);
-        }).collect(Collectors.toList());
+        });
+        CardReference.persist(cardReferences);
     }
 
 }

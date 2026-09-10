@@ -9,6 +9,11 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.security.jpa.Password;
 import io.quarkus.security.jpa.Roles;
@@ -18,15 +23,21 @@ import io.quarkus.security.jpa.Username;
 @Entity
 @Table(name="app_users")
 @UserDefinition
+@JsonIdentityInfo (
+  generator = ObjectIdGenerators.PropertyGenerator.class, 
+  property = "id")
 public class User extends PanacheEntity {
     @Username
     public String username;
+    
     @Password
+    @JsonIgnore 
     public String password;
     @Roles
     public String role;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner")
+    @JsonManagedReference 
     public List<Card> inventory;
 
     /**
