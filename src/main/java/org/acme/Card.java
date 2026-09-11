@@ -51,6 +51,10 @@ public class Card extends PanacheEntity {
     }
 
     public static List<Card> findBorrowableCards(List<CardInput> cardInputs){
-        return new ArrayList<>();
+        List<Card> borrowableCards = cardInputs.stream().map(cardInput -> {
+            Card card = Card.find("name LIKE ?1 AND LANGUAGE = ?2 AND QUALITY <= ?3", cardInput.name, cardInput.language, cardInput.quality).firstResult();
+            return card;
+        }).toList();
+        return borrowableCards;
     }
 }
