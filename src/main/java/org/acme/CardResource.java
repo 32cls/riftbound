@@ -103,6 +103,16 @@ public class CardResource {
         }
         return Response.created(URI.create("/cards")).build();
     }
+
+    @POST
+    @Transactional
+    @RolesAllowed("user")
+    @Path("/borrowable")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response findBorrowableCards(@Context SecurityContext ctx, List<CardInput> inputCards){
+        List<Card> cards = Card.findBorrowableCards(inputCards);
+        return Response.ok(cards).build();
+    }
     
     @DELETE
     @Path("/{cardId}")

@@ -1,8 +1,6 @@
 package org.acme;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -35,9 +33,13 @@ public class Card extends PanacheEntity {
     public Quality quality;
     public Language language;
     public int quantity;
-
+    public boolean isBorrowed;
+    
     @ManyToOne
     public User owner;
+
+    @ManyToOne
+    public User borrower;
 
     @ManyToOne
     public CardReference cardReference;
@@ -48,11 +50,12 @@ public class Card extends PanacheEntity {
         this.quantity = quantity;
         this.owner = owner;
         this.cardReference = cardReference;
+        this.isBorrowed = false;
     }
 
     public static List<Card> findBorrowableCards(List<CardInput> cardInputs){
         List<Card> borrowableCards = cardInputs.stream().map(cardInput -> {
-            Card card = Card.find("name LIKE ?1 AND LANGUAGE = ?2 AND QUALITY <= ?3", cardInput.name, cardInput.language, cardInput.quality).firstResult();
+            Card card = Card.find("name LIKE ?1 AND LANGUAGE = ?2 AND QUALITY <= ?3 AND ISBORROWED IS FALSE ORDER BY QUANTITY DESC", cardInput.name, cardInput.language, cardInput.quality).firstResult();
             return card;
         }).toList();
         return borrowableCards;
