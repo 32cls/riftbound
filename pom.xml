@@ -77,6 +77,10 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-search-orm-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit</artifactId>
             <scope>test</scope>
         </dependency>
@@ -84,6 +88,17 @@
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.meilisearch.sdk</groupId>
+          <artifactId>meilisearch-java</artifactId>
+          <version>0.21.0</version>
+        </dependency>
+        <dependency>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+          <version>20260814</version>
+          <scope>compile</scope>
         </dependency>
     </dependencies>
 

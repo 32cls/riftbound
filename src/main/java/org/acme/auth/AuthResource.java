@@ -17,7 +17,8 @@ import java.time.Duration;
 import java.util.Set;
 
 import org.acme.User;
-import org.acme.UserInput;
+import org.acme.LoginInput;
+import org.acme.RegisterInput;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import io.smallrye.jwt.build.Jwt;
@@ -35,10 +36,10 @@ public class AuthResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/login")
     @PermitAll
-    public Response login(UserInput userInput) {
+    public Response login(LoginInput loginInput) {
         User authenticatedUser = null;
         try {
-            authenticatedUser = User.checkLogin(userInput.username, userInput.password);
+            authenticatedUser = User.checkLogin(loginInput.username, loginInput.password);
         } catch (RuntimeException e){
             return Response.status(Response.Status.UNAUTHORIZED.getStatusCode(), e.getLocalizedMessage()).build();
         }
@@ -57,9 +58,9 @@ public class AuthResource {
     @Path("/register")
     @Transactional
     @PermitAll
-    public Response register(UserInput userInput) {
-        Set<ConstraintViolation<UserInput>> violations = validator.validate(userInput);
-        if (violations.isEmpty()) {
+    public Response register(RegisterInput userInput) {
+        Set<ConstraintViolation<RegisterInput>> violations = validator.validate(userInput);
+        if (violations.isEmpty() && userInput.password == userInput.confirmPassword) {
             Long userId = User.add(userInput.username, userInput.password);
             return Response.created(URI.create("/users/"+userId)).build();
         } else {
