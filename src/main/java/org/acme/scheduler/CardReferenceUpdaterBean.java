@@ -19,9 +19,10 @@ public class CardReferenceUpdaterBean {
     @RestClient
     CardReferenceService cardReferenceService;
 
-    @Scheduled(cron="* * * * * ?")
+    @Scheduled(cron="0 0/10 * * * ?")
     @Transactional
     void cronJob(ScheduledExecution execution) {
+        System.out.println("10 minutes");
         if (CardReference.count() > 0) {
             return;
         }

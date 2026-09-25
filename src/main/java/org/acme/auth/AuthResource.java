@@ -60,7 +60,7 @@ public class AuthResource {
     @PermitAll
     public Response register(RegisterInput userInput) {
         Set<ConstraintViolation<RegisterInput>> violations = validator.validate(userInput);
-        if (violations.isEmpty() && userInput.password == userInput.confirmPassword) {
+        if (violations.isEmpty() && userInput.password.equals(userInput.confirmPassword)) {
             Long userId = User.add(userInput.username, userInput.password);
             return Response.created(URI.create("/users/"+userId)).build();
         } else {

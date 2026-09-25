@@ -4,6 +4,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Config;
 
+import io.quarkus.arc.Unremovable;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 
@@ -19,6 +20,7 @@ public class ConfigBean {
     String meiliEndpoint;
 
     @Produces
+    @Unremovable
     Client getMeiliClient() {
         if (this.client == null) {
             this.client = new Client(new Config(this.meiliEndpoint, this.masterKey));

@@ -46,3 +46,4 @@ nb-configuration.xml
 
 *.pem
 meili_data/
+.zed/
