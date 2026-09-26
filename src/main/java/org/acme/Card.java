@@ -53,9 +53,9 @@ public class Card extends PanacheEntity {
         this.isBorrowed = false;
     }
 
-    public static List<Card> findBorrowableCards(List<CardInput> cardInputs){
-        List<Card> borrowableCards = cardInputs.stream().map(cardInput -> {
-            Card card = Card.find("name LIKE ?1 AND LANGUAGE = ?2 AND QUALITY <= ?3 AND ISBORROWED IS FALSE ORDER BY QUANTITY DESC", cardInput.name, cardInput.language, cardInput.quality).firstResult();
+    public static List<Card> findBorrowableCards(BorrowableCardsInput borrowableCardsInput){
+        List<Card> borrowableCards = borrowableCardsInput.cards.stream().map(cardInput -> {
+            Card card = Card.find("name LIKE ?1 AND LANGUAGE = ?2 AND QUALITY <= ?3 AND ISBORROWED IS FALSE INNER JOIN app_users ON app_users.id = card.owner ORDER BY ST_Distance(ST_Transform(?4), ST_Transform(card.owner.location)) ASC, QUANTITY DESC", cardInput.name, cardInput.language, cardInput.quality, borrowableCardsInput.location).firstResult();
             return card;
         }).toList();
         return borrowableCards;

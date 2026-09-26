@@ -9,6 +9,8 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import java.util.List;
 
+import org.locationtech.jts.geom.Point;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -43,6 +45,12 @@ public class User extends PanacheEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "borrower")
     @JsonManagedReference
     public List<Card> borrowing;
+
+    public Point location;
+
+    public void setLocation(Point location) {
+        this.location = location;
+    }
 
     /**
      * Adds a new user to the database

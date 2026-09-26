@@ -1,7 +1,5 @@
 package org.acme;
 
-import java.util.ArrayList;
-
 import org.acme.dto.CardReferenceDto;
 
 import com.meilisearch.sdk.Client;
@@ -13,7 +11,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 @Entity
@@ -62,10 +59,7 @@ public class CardReference extends PanacheEntity {
     private void updateIndexForCard(){
         Client client = CDI.current().select(Client.class).get();
         Index index = client.index("card_references");
-        JSONArray jsonArray = new JSONArray();
         JSONObject jsonCard = new JSONObject().put("id", this.id.toString()).put("riftbound_identifier", this.riftboundId).put("name", this.name).put("image_url", this.imageUrl);
-        System.out.println("Pushing new card: " + jsonCard.toString());
-        jsonArray.put(jsonCard);
-        index.addDocuments(jsonArray.toString());
+        index.addDocuments(jsonCard.toString());
     }
 }

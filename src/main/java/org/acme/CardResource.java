@@ -109,8 +109,8 @@ public class CardResource {
     @RolesAllowed("user")
     @Path("/borrowable")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response findBorrowableCards(@Context SecurityContext ctx, List<CardInput> inputCards){
-        List<Card> cards = Card.findBorrowableCards(inputCards);
+    public Response findBorrowableCards(@Context SecurityContext ctx, BorrowableCardsInput borrowableCardsInput){
+        List<Card> cards = Card.findBorrowableCards(borrowableCardsInput);
         return Response.ok(cards).build();
     }
     
