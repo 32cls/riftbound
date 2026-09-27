@@ -29,4 +29,9 @@ public class Borrow extends PanacheEntity {
         this.cards = cards;
     }
 
+    public static createBorrow(List<String> cardIds, User user){
+        List<Card> cards = Card.findByIds(cardIds);
+        
+    }
+
 }

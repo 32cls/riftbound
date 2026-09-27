@@ -14,4 +14,7 @@ public class RegisterInput {
 
     @NotBlank
     public String confirmPassword;
+
+    public PointInput location;
+
 }

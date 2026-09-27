@@ -109,11 +109,12 @@ public class CardResource {
     @RolesAllowed("user")
     @Path("/borrowable")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response findBorrowableCards(@Context SecurityContext ctx, BorrowableCardsInput borrowableCardsInput){
-        List<Card> cards = Card.findBorrowableCards(borrowableCardsInput);
+    public Response findBorrowableCards(@Context SecurityContext ctx, List<CardInput> cardsInput){
+        User authenticatedUser = User.findById(ctx.getUserPrincipal().getName());
+        List<BorrowableCardDto> cards = Card.findBorrowableCards(cardsInput, authenticatedUser);
         return Response.ok(cards).build();
     }
-    
+
     @DELETE
     @Path("/{cardId}")
     @RolesAllowed("user")

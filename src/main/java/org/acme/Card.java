@@ -1,6 +1,7 @@
 package org.acme;
 
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -8,9 +9,14 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
 
 @Entity
-@JsonIdentityInfo (
+@NamedQueries({
+    @NamedQuery(name = "Card.findBorrowableCards", query = "SELECT c.id, cr.name, cr.set, c.quantity, c.quality, c.owner.username, cr.riftboundId, cr.imageUrl, distance_meters(:location, u.location) as dist FROM Card c INNER JOIN User u ON u.id = c.owner.id INNER JOIN CardReference cr ON c.cardReference.id = cr.id WHERE cr.name LIKE :name AND c.language = :language AND c.quality <= :quality AND c.isBorrowed IS FALSE AND u.id <> :id ORDER BY dist ASC, c.quantity DESC LIMIT 10"),
+})
+@JsonIdentityInfo(
   generator = ObjectIdGenerators.PropertyGenerator.class,
   property = "id")
 public class Card extends PanacheEntity {
@@ -34,7 +40,7 @@ public class Card extends PanacheEntity {
     public Language language;
     public int quantity;
     public boolean isBorrowed;
-    
+
     @ManyToOne
     public User owner;
 
@@ -53,10 +59,11 @@ public class Card extends PanacheEntity {
         this.isBorrowed = false;
     }
 
-    public static List<Card> findBorrowableCards(BorrowableCardsInput borrowableCardsInput){
-        List<Card> borrowableCards = borrowableCardsInput.cards.stream().map(cardInput -> {
-            Card card = Card.find("name LIKE ?1 AND LANGUAGE = ?2 AND QUALITY <= ?3 AND ISBORROWED IS FALSE INNER JOIN app_users ON app_users.id = card.owner ORDER BY ST_Distance(ST_Transform(?4), ST_Transform(card.owner.location)) ASC, QUANTITY DESC", cardInput.name, cardInput.language, cardInput.quality, borrowableCardsInput.location).firstResult();
-            return card;
+    public static List<BorrowableCardDto> findBorrowableCards(List<CardInput> cards, User user){
+        List<BorrowableCardDto> borrowableCards = cards.stream().map(cardInput -> {
+            user.location.setSRID(4326);
+            BorrowableCardDto bCard = find("#Card.findBorrowableCards", Map.of("name", cardInput.name, "language", cardInput.language, "quality", cardInput.quality, "id", user.id, "location", user.location)).project(BorrowableCardDto.class).firstResult();
+            return bCard;
         }).toList();
         return borrowableCards;
     }

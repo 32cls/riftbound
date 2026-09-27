@@ -1,6 +1,7 @@
 package org.acme;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -9,7 +10,10 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import java.util.List;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,6 +33,8 @@ import io.quarkus.security.jpa.Username;
   generator = ObjectIdGenerators.PropertyGenerator.class,
   property = "id")
 public class User extends PanacheEntity {
+
+    @Column(unique=true)
     @Username
     public String username;
 
@@ -46,6 +52,7 @@ public class User extends PanacheEntity {
     @JsonManagedReference
     public List<Card> borrowing;
 
+    @JsonIgnore
     public Point location;
 
     public void setLocation(Point location) {
@@ -58,11 +65,13 @@ public class User extends PanacheEntity {
      * @param password the unencrypted password (it is encrypted with bcrypt)
      * @param role the comma-separated roles
      */
-    public static Long add(String username, String password) {
+    public static Long add(String username, String password, Long x, Long y) {
         User user = new User();
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         user.username = username;
         user.password = BcryptUtil.bcryptHash(password);
         user.role = "user";
+        user.location = geometryFactory.createPoint(new Coordinate(x, y));
         user.persist();
         return user.id;
     }

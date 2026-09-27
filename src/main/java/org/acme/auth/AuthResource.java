@@ -61,7 +61,7 @@ public class AuthResource {
     public Response register(RegisterInput userInput) {
         Set<ConstraintViolation<RegisterInput>> violations = validator.validate(userInput);
         if (violations.isEmpty() && userInput.password.equals(userInput.confirmPassword)) {
-            Long userId = User.add(userInput.username, userInput.password);
+            Long userId = User.add(userInput.username, userInput.password, userInput.location.X, userInput.location.Y);
             return Response.created(URI.create("/users/"+userId)).build();
         } else {
             violations.forEach(v -> { System.out.println(v.getMessage());});
