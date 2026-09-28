@@ -7,6 +7,7 @@ import io.quarkus.hibernate.orm.panache.Panache;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Context;
@@ -24,13 +25,19 @@ public class BorrowResource {
     public Response borrowCard(@Context SecurityContext ctx, List<String> cardIds){
         User authenticatedUser = User.findById(ctx.getUserPrincipal().getName());
         List<Borrow> borrowings = Borrow.createBorrowings(cardIds, authenticatedUser);
+        Panache.flush(); // unsure?
+        List<BorrowDto> dtos = Borrow.mapBorrowingsToDto(borrowings);
+        return Response.ok(dtos).build();
+    }
+
+    @GET
+    @Transactional
+    @RolesAllowed("user")
+    public Response listBorrowings(@Context SecurityContext ctx){
+        User authenticatedUser = User.findById(ctx.getUserPrincipal().getName());
+        List<Borrow> borrowings = Borrow.findByUserId(authenticatedUser);
         Panache.flush();
-        List<BorrowDto> dtos = borrowings.stream().map(b -> new BorrowDto(
-                b.id,
-                b.owner.id, b.owner.username,
-                b.borrower.id, b.borrower.username,
-                b.cards.stream().map(c -> c.id).toList(),
-                b.getCreatedAt(), b.getUpdatedAt())).toList();
+        List<BorrowDto> dtos = Borrow.mapBorrowingsToDto(borrowings);
         return Response.ok(dtos).build();
     }
 

@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.panache.common.Sort;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -22,11 +23,11 @@ public class Borrow extends PanacheEntity {
     public User borrower;
     @OneToMany
     public List<Card> cards;
-    @CreationTimestamp 
+    @CreationTimestamp
     private Instant createdAt;
-    @UpdateTimestamp 
+    @UpdateTimestamp
     private Instant updatedAt;
-        
+
     public Borrow(User owner, User borrower, List<Card> cards) {
         this.owner = owner;
         this.borrower = borrower;
@@ -41,22 +42,35 @@ public class Borrow extends PanacheEntity {
         return updatedAt;
     }
 
+    public static List<Borrow> findByUserId(User user){
+        return find("owner = ?1 OR borrower = ?2", Sort.descending("updatedAt"), user, user).list();
+    }
+
     public static List<Borrow> createBorrowings(List<String> cardIds, User user){
         List<Card> cards = Card.findByIds(cardIds);
-        
+
         Map<Long, List<Card>> byOwner = cards.stream().collect(Collectors.groupingBy(c -> c.owner.id));
-    
+
         return byOwner.entrySet().stream().map(entry -> {
             User owner = User.findById(entry.getKey());
             Borrow b = new Borrow(owner, user, entry.getValue());
             b.persist();
-            cards.forEach(card -> { 
-                card.borrower = user; 
+            cards.forEach(card -> {
+                card.borrower = user;
                 card.isBorrowed = true;
-                card.persist(); 
+                card.persist();
             });
             return b;
         }).toList();
+    }
+
+    public static List<BorrowDto> mapBorrowingsToDto(List<Borrow> borrowings) {
+        return borrowings.stream().map(b -> new BorrowDto(
+                b.id,
+                b.owner.id, b.owner.username,
+                b.borrower.id, b.borrower.username,
+                b.cards.stream().map(c -> c.id).toList(),
+                b.getCreatedAt(), b.getUpdatedAt())).toList();
     }
 
 }
