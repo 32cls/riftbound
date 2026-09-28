@@ -14,7 +14,7 @@ import jakarta.persistence.NamedQuery;
 
 @Entity
 @NamedQueries({
-    @NamedQuery(name = "Card.findBorrowableCards", query = "SELECT c.id, cr.name, cr.set, c.quantity, c.quality, c.owner.username, cr.riftboundId, cr.imageUrl, distance_meters(:location, u.location) as dist FROM Card c INNER JOIN User u ON u.id = c.owner.id INNER JOIN CardReference cr ON c.cardReference.id = cr.id WHERE cr.name LIKE :name AND c.language = :language AND c.quality <= :quality AND c.isBorrowed IS FALSE AND u.id <> :id ORDER BY dist ASC, c.quantity DESC LIMIT 10"),
+    @NamedQuery(name = "Card.findBorrowableCards", query = "SELECT c.id, cr.name, cr.set, c.quality, c.owner.username, cr.riftboundId, cr.imageUrl, distance_meters(:location, u.location) as dist FROM Card c INNER JOIN User u ON u.id = c.owner.id INNER JOIN CardReference cr ON c.cardReference.id = cr.id WHERE cr.name LIKE :name AND c.language = :language AND c.quality <= :quality AND c.isBorrowed IS FALSE AND u.id <> :id ORDER BY dist ASC LIMIT 30"),
 })
 @JsonIdentityInfo(
   generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -38,7 +38,6 @@ public class Card extends PanacheEntity {
 
     public Quality quality;
     public Language language;
-    public int quantity;
     public boolean isBorrowed;
 
     @ManyToOne
@@ -50,10 +49,9 @@ public class Card extends PanacheEntity {
     @ManyToOne
     public CardReference cardReference;
 
-    public Card(Language language, Quality quality, int quantity, User owner, CardReference cardReference){
+    public Card(Language language, Quality quality, User owner, CardReference cardReference){
         this.language = language;
         this.quality = quality;
-        this.quantity = quantity;
         this.owner = owner;
         this.cardReference = cardReference;
         this.isBorrowed = false;

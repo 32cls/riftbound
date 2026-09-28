@@ -1,5 +1,17 @@
 package org.acme;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+
+import org.acme.Card.Language;
+import org.acme.Card.Quality;
+import org.jboss.resteasy.reactive.RestForm;
+
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
@@ -16,21 +28,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.acme.Card.Language;
-import org.acme.Card.Quality;
-import org.jboss.resteasy.reactive.RestForm;
 
 @Path("/cards")
 public class CardResource {
@@ -58,7 +55,7 @@ public class CardResource {
             if (cardReference == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            Card card = new Card(cardInput.language, cardInput.quality, cardInput.quantity, authenticatedUser, cardReference);
+            Card card = new Card(cardInput.language, cardInput.quality, authenticatedUser, cardReference);
             card.persist();
             return Response.created(URI.create("/cards/"+card.id)).build();
         } else {
@@ -79,24 +76,18 @@ public class CardResource {
         Scanner scanner;
         try {
             scanner = new Scanner(file);
-            HashMap<String,Integer> cardNames = new HashMap<>();
             List<Card> cards = new ArrayList<>();
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] parsedLine = line.split(" ", 2);
                 int quantity = Integer.parseInt(parsedLine[0]);
                 String parsedCardName = parsedLine[1].split(" \\(", 2)[0].replace(",", "").replace(" -", "");
-                cardNames.put(parsedCardName, quantity);
-            }
-            List<CardReference> cardReferences = CardReference.find("name in ?1", cardNames.keySet()).list();
-            Map<String, CardReference> refByName = cardReferences.stream().collect(Collectors.toMap(r -> r.name, r -> r, (a, b) -> a));
-            cardNames.forEach((key, val) -> {
-                CardReference ref = refByName.get(key);
-                if (ref != null) {
-                    cards.add(new Card(Language.ENGLISH, Quality.NEAR_MINT, val, authenticatedUser, ref));
+                CardReference cardReference = CardReference.findByName(parsedCardName);
+                for (int i = 0; i < quantity; i++) {
+                    cards.add(new Card(Language.ENGLISH, Quality.NEAR_MINT, authenticatedUser, cardReference));
                 }
-            });
-            Card.persist(cards);
+                Card.persist(cards);
+            }           
             scanner.close();
         } catch (FileNotFoundException e){
             return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "File not found").build();
