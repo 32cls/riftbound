@@ -23,7 +23,7 @@ public class BorrowResource {
     @RolesAllowed("user")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response borrowCard(@Context SecurityContext ctx, List<String> cardIds){
-        User authenticatedUser = User.findById(ctx.getUserPrincipal().getName());
+        User authenticatedUser = User.findById(Long.parseLong(ctx.getUserPrincipal().getName()));
         List<Borrow> borrowings = Borrow.createBorrowings(cardIds, authenticatedUser);
         Panache.flush(); // unsure?
         List<BorrowDto> dtos = Borrow.mapBorrowingsToDto(borrowings);
@@ -34,7 +34,7 @@ public class BorrowResource {
     @Transactional
     @RolesAllowed("user")
     public Response listBorrowings(@Context SecurityContext ctx){
-        User authenticatedUser = User.findById(ctx.getUserPrincipal().getName());
+        User authenticatedUser = User.findById(Long.parseLong(ctx.getUserPrincipal().getName()));
         List<Borrow> borrowings = Borrow.findByUserId(authenticatedUser);
         Panache.flush();
         List<BorrowDto> dtos = Borrow.mapBorrowingsToDto(borrowings);

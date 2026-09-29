@@ -50,7 +50,7 @@ public class CardResource {
     public Response addCard(@Context SecurityContext ctx, CardInput cardInput) {
         Set<ConstraintViolation<CardInput>> violations = validator.validate(cardInput);
         if (violations.isEmpty()) {
-            User authenticatedUser = User.findById(ctx.getUserPrincipal().getName());
+            User authenticatedUser = User.findById(Long.parseLong(ctx.getUserPrincipal().getName()));
             CardReference cardReference = CardReference.findByName(cardInput.name);
             if (cardReference == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -69,7 +69,7 @@ public class CardResource {
     @Path("/list")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response addCardList(@Context SecurityContext ctx, @RestForm("list") File file) {
-        User authenticatedUser = User.findById(ctx.getUserPrincipal().getName());
+        User authenticatedUser = User.findById(Long.parseLong(ctx.getUserPrincipal().getName()));
         if (!file.canRead()){
             return Response.status(Response.Status.BAD_REQUEST.getStatusCode(), "File cannot be read").build();
         }
@@ -101,7 +101,7 @@ public class CardResource {
     @Path("/borrowable")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response findBorrowableCards(@Context SecurityContext ctx, List<CardInput> cardsInput){
-        User authenticatedUser = User.findById(ctx.getUserPrincipal().getName());
+        User authenticatedUser = User.findById(Long.parseLong(ctx.getUserPrincipal().getName()));
         List<BorrowableCardDto> cards = Card.findBorrowableCards(cardsInput, authenticatedUser);
         return Response.ok(cards).build();
     }
