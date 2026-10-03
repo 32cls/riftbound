@@ -2,13 +2,12 @@ package org.acme;
 
 import java.util.List;
 
-import io.quarkus.hibernate.orm.panache.Panache;
-
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -25,9 +24,24 @@ public class BorrowResource {
     public Response borrowCard(@Context SecurityContext ctx, List<String> cardIds){
         User authenticatedUser = User.findById(Long.parseLong(ctx.getUserPrincipal().getName()));
         List<Borrow> borrowings = Borrow.createBorrowings(cardIds, authenticatedUser);
-        Panache.flush(); // unsure?
         List<BorrowDto> dtos = Borrow.mapBorrowingsToDto(borrowings);
         return Response.ok(dtos).build();
+    }
+
+    @PUT
+    @Transactional
+    @Path("/{id}")
+    @RolesAllowed("user")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response returnBorrow(@Context SecurityContext ctx, Long borrowId){
+        User authenticatedUser = User.findById(Long.parseLong(ctx.getUserPrincipal().getName()));
+        Borrow borrow = Borrow.findById(borrowId);
+        if (borrow.borrower.id != authenticatedUser.id) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        borrow.returned = true;
+        borrow.persist();
+        return Response.ok(borrow).build();
     }
 
     @GET
@@ -36,7 +50,6 @@ public class BorrowResource {
     public Response listBorrowings(@Context SecurityContext ctx){
         User authenticatedUser = User.findById(Long.parseLong(ctx.getUserPrincipal().getName()));
         List<Borrow> borrowings = Borrow.findByUserId(authenticatedUser);
-        Panache.flush();
         List<BorrowDto> dtos = Borrow.mapBorrowingsToDto(borrowings);
         return Response.ok(dtos).build();
     }

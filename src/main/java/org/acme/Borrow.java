@@ -23,6 +23,9 @@ public class Borrow extends PanacheEntity {
     public User borrower;
     @OneToMany
     public List<Card> cards;
+    
+    public boolean returned = false;
+    
     @CreationTimestamp
     private Instant createdAt;
     @UpdateTimestamp
