@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.ws.rs.NotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 import java.util.List;
@@ -20,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import io.quarkus.elytron.security.common.BcryptUtil;
 import io.quarkus.security.jpa.Password;
 import io.quarkus.security.jpa.Roles;
 import io.quarkus.security.jpa.UserDefinition;
@@ -34,13 +32,15 @@ import io.quarkus.security.jpa.Username;
   property = "id")
 public class User extends PanacheEntity {
 
+    private static final int SRID = 4326;
+
     @Column(unique=true)
     @Username
     public String username;
 
     @Password
-    @JsonIgnore
     public String password;
+
     @Roles
     public String role;
 
@@ -55,37 +55,21 @@ public class User extends PanacheEntity {
     @JsonIgnore
     public Point location;
 
-    public void setLocation(Point location) {
-        this.location = location;
+    public void setLocation(Coordinate coordinate) {
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), SRID);
+        this.location = geometryFactory.createPoint(coordinate);
     }
 
-    /**
-     * Adds a new user to the database
-     * @param username the username
-     * @param password the unencrypted password (it is encrypted with bcrypt)
-     * @param role the comma-separated roles
-     */
-    public static Long add(String username, String password, Long x, Long y) {
+    public static User add(String username) {
         User user = new User();
-        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         user.username = username;
-        user.password = BcryptUtil.bcryptHash(password);
         user.role = "user";
-        user.location = geometryFactory.createPoint(new Coordinate(x, y));
         user.persist();
-        return user.id;
+        return user;
     }
 
-    public static User checkLogin(String username, String password) throws NotFoundException {
-        User user = find("username", username).firstResult();
-        if (user == null) {
-            throw new NotFoundException("User not found");
-        }
-        if (BcryptUtil.matches(password, user.password)) {
-            return user;
-        } else {
-            throw new RuntimeException("Invalid password exception");
-        }
+    public static User findByUsername(String username) {
+        return find("username", username).firstResult();
     }
 
 }
