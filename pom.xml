@@ -53,14 +53,6 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-jwt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-jwt-build</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-security-jpa</artifactId>
         </dependency>
         <dependency>
@@ -98,9 +90,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>com.meilisearch.sdk</groupId>
-          <artifactId>meilisearch-java</artifactId>
-          <version>0.18.0</version>
+            <groupId>com.meilisearch.sdk</groupId>
+            <artifactId>meilisearch-java</artifactId>
+            <version>0.18.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.squareup.okhttp3</groupId>
@@ -114,9 +106,9 @@
             <version>4.12.0</version>
         </dependency>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20260814</version>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+          <version>20260814</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
