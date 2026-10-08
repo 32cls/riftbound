@@ -1,6 +1,6 @@
-package org.acme;
+package org.acme.dto;
 
-import org.acme.Card.Quality;
+import org.acme.domain.Card.Quality;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 

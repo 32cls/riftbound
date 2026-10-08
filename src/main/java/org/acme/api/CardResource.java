@@ -1,4 +1,4 @@
-package org.acme;
+package org.acme.api;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,8 +8,13 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-import org.acme.Card.Language;
-import org.acme.Card.Quality;
+import org.acme.domain.Card;
+import org.acme.domain.CardReference;
+import org.acme.domain.User;
+import org.acme.domain.Card.Language;
+import org.acme.domain.Card.Quality;
+import org.acme.dto.BorrowableCardDto;
+import org.acme.input.CardInput;
 import org.jboss.resteasy.reactive.RestForm;
 
 import jakarta.annotation.security.PermitAll;

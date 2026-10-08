@@ -1,6 +1,6 @@
 package org.acme.rest;
 
-import org.acme.dto.CardRequestDto;
+import org.acme.external.CardRequestDto;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import jakarta.ws.rs.GET;

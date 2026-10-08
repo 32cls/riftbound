@@ -1,4 +1,4 @@
-package org.acme.dto;
+package org.acme.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

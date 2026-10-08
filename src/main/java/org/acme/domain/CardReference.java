@@ -1,6 +1,4 @@
-package org.acme;
-
-import org.acme.dto.CardReferenceDto;
+package org.acme.domain;
 
 import com.meilisearch.sdk.Client;
 import com.meilisearch.sdk.Index;
@@ -11,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 
+import org.acme.external.CardReferenceDto;
 import org.json.JSONObject;
 
 @Entity

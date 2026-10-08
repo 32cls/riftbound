@@ -1,7 +1,12 @@
-package org.acme;
+package org.acme.api;
 
 import java.net.URI;
 import java.util.List;
+
+import org.acme.domain.Card;
+import org.acme.domain.Deck;
+import org.acme.domain.User;
+import org.acme.dto.DeckDto;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
@@ -48,7 +53,10 @@ public class DeckResource {
     @POST
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createDeck(Deck myDeck) {
+    @RolesAllowed("user")
+    public Response createDeck(@Context SecurityContext ctx, Deck myDeck) {
+        User authenticatedUser = User.findById(Long.parseLong(ctx.getUserPrincipal().getName()));
+        myDeck.owner = authenticatedUser;
         myDeck.persist();
         return Response.created(URI.create("/decks/"+myDeck.id)).build();
     }

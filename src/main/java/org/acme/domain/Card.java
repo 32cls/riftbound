@@ -1,7 +1,10 @@
-package org.acme;
+package org.acme.domain;
 
 import java.util.List;
 import java.util.Map;
+
+import org.acme.dto.BorrowableCardDto;
+import org.acme.input.CardInput;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -21,14 +24,14 @@ import jakarta.persistence.NamedQuery;
   property = "id")
 public class Card extends PanacheEntity {
 
-    enum Language {
+    public enum Language {
         CHINESE,
         ENGLISH,
         FRENCH,
         KOREAN
     }
 
-    enum Quality {
+    public enum Quality {
         MINT,
         NEAR_MINT,
         GOOD,

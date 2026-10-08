@@ -1,7 +1,7 @@
-package org.acme;
+package org.acme.input;
 
-import org.acme.Card.Language;
-import org.acme.Card.Quality;
+import org.acme.domain.Card.Language;
+import org.acme.domain.Card.Quality;
 
 import jakarta.validation.constraints.NotBlank;
 

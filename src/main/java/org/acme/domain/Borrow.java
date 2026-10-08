@@ -1,10 +1,11 @@
-package org.acme;
+package org.acme.domain;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.acme.dto.BorrowDto;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 

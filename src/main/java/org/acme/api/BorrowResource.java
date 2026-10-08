@@ -1,6 +1,10 @@
-package org.acme;
+package org.acme.api;
 
 import java.util.List;
+
+import org.acme.domain.Borrow;
+import org.acme.domain.User;
+import org.acme.dto.BorrowDto;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;

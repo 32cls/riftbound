@@ -2,9 +2,9 @@ package org.acme.scheduler;
 
 import java.util.stream.Stream;
 
-import org.acme.CardReference;
-import org.acme.dto.CardReferenceDto;
-import org.acme.dto.CardRequestDto;
+import org.acme.domain.CardReference;
+import org.acme.external.CardReferenceDto;
+import org.acme.external.CardRequestDto;
 import org.acme.rest.CardReferenceService;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 

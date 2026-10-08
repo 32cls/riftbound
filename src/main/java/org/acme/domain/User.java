@@ -1,4 +1,4 @@
-package org.acme;
+package org.acme.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
